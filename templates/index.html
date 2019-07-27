@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+{% load static %}
+<head>
+    <title>{% block title %}Hello, world!{% endblock title %}</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+</head>
+<body>
+{% block body %}
+    <h1>{% block heading %}Hello, world!{% endblock heading %}</h1>
+    {% block content %}
+        <p>Greetings from the Django templating engine!</p>
+    {% endblock content %}
+{% endblock body %}
+</body>
+</html>
