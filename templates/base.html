@@ -29,7 +29,7 @@
     {% block head_rss %}{% endblock head_rss %}
     {% block head_css %}
         {% block head_css_site %}
-        <link rel="stylesheet" type="text/css" href="/static/css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}"/>
         {% endblock head_css_site %}
         {% block head_css_section %}{% endblock head_css_section %}
         {% block head_css_page %}{% endblock head_css_page %}
@@ -74,7 +74,7 @@
 {% block footer %}   
     {% block footer_javascript %}
         {% block footer_javascript_site %}
-        <script language="JavaScript" type="text/javascript" src="/static/js/jquery.js"></script>
+        <script language="JavaScript" type="text/javascript" src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
         {% endblock footer_javascript_site %}
         {% block footer_javascript_section %}{% endblock footer_javascript_section %}
         {% block footer_javascript_page %}{% endblock footer_javascript_page %}
