@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from djax import views
+from djax import views, clock_skew
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.home),
+    url(r'^time$', clock_skew.home),
+    url(r'^time/json$', clock_skew.timestamp),
 ]
