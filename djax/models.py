@@ -74,3 +74,9 @@ class Entity(models.Model):
 # register Entity model to use with the tagging application
 # tagging is intended atleast initially to locate areas of expertise
 register(Entity)
+
+
+class TextStatus(models.Model):
+    datetime = models.DateTimeField(default=datetime.now)
+    entity = models.ForeignKey(Entity)
+    text = models.TextField()
