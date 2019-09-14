@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from __future__ import unicode_literals
 import re
 import datetime
 from django.db import models
@@ -6,11 +7,11 @@ from tagging.registry import register
 
 
 OFFICE_CHOICES = (
-    (u'KLA', u'Kampala Office, Central, Uganda'),
-    (u'MKN', u'Busia Office, Eastern, Uganda'),
-    (u'WAK', u'Gulu Office, Northern, Uganda'),
-    (u'MSK', u'Hoima Office, Western, Uganda'),
-    (u'KAB', u'Kabale Office, South-Western Uganda'),
+    ('KLA', 'Kampala Office, Central, Uganda'),
+    ('MKN', 'Busia Office, Eastern, Uganda'),
+    ('WAK', 'Gulu Office, Northern, Uganda'),
+    ('MSK', 'Hoima Office, Western, Uganda'),
+    ('KAB', 'Kabale Office, South-Western Uganda'),
 )
 
 
@@ -26,12 +27,12 @@ class TextEmailField(models.EmailField):
     entity = models.ForiegnKey('Entity')
 
     def get_internal_type(self):
-        return u'TextField'
+        return 'TextField'
 
 
 class TextURLField(models.URLField):
     def get_internal_type(self):
-        return u'TextField'
+        return 'TextField'
 
 
 class TextPhoneField(models.TextField):
@@ -45,7 +46,7 @@ class TextPhoneField(models.TextField):
             return False
     
     def remove_formatting(self):
-        return re.sub(ur'\D', u'', str(self)
+        return re.sub(ur'\D', '', str(self)
 
 
 class Entity(models.Model):
