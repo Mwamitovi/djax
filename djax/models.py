@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from django.db import models
 import datetime
+import re
 
 
 OFFICE_CHOICES = (
@@ -20,4 +21,13 @@ class Location(models.Model):
     coordinates = GPSCoordinate(required=False)
 
     
+class TextEmailField(models.EmailField):
+    entity = models.ForiegnKey('Entity')
 
+    def get_internal_type(self):
+        return u'TextField'
+
+
+class TextURLField(models.URLField):
+    def get_internal_type(self):
+        return u'TextField'
