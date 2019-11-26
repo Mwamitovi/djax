@@ -1,22 +1,57 @@
 # !/usr/bin/python/
 from __future__ import unicode_literals
 import re
+import json
 from functools import cmp_to_key
 
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core import serializers
+from django.contrib.auth import authenticate, login
 from .models import Entity
+from .functions import ajax_login_required
 
 RESULTS_PER_PAGE = 10
 
 
+def ajax_login_request(request):
+    """
+    We check for key in request.POST,
+    if non-existent, we default to a request.GET
+    """
+    try:
+        request.POST['login']
+        dictionary = request.POST
+    except KeyError:
+        dictionary = request.GET
+
+    user = authenticate(
+        username=dictionary['login'],
+        password=dictionary['password']
+    )
+
+    if user and user.is_active:
+        login(request, user)
+        result = True
+    else:
+        result = False
+
+    return HttpResponse(json.dumps(result), mimetype='application/json')
+
+
 def home(request):
-    return render(request, 'index.html')
+    return render(request, 'search.html')
 
 
+@ajax_login_required
 def search(request):
-    query = request.POST['query']
+    try:
+        query = request.POST['query']
+        dictionary = request.POST
+    except KeyError:
+        query = request.GET['query']
+        dictionary = request.GET
+
     # (?u) passes a flag to be unicode sensitive.
     # With it, any letter/word character in any
     # language is recognized as a word character.
@@ -57,22 +92,18 @@ def search(request):
     results.sort(key=cmp_to_key(compare))
 
     try:
-        start = int(request.POST['start'])
+        start = int(dictionary['start'])
     except KeyError:
         start = 0
 
     try:
-        results_per_page = int(request.POST['results_per_page'])
+        results_per_page = int(dictionary['results_per_page'])
     except KeyError:
         results_per_page = RESULTS_PER_PAGE
 
     returned_results = results[start:start + results_per_page]
-    json_serializer = serializers.get_serializer('json')()
-    response = HttpResponse()
-    response['Content-type'] = 'text/json'
-    json_serializer.serialize(
-        [returned_results, len(results)],
-        ensure_ascii=False,
-        stream=response
+    response = HttpResponse(
+        json.dumps([returned_results, len(results)]),
+        mimetype='application/json'
     )
     return response
