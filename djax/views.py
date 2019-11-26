@@ -1,15 +1,18 @@
 #!/usr/bin/python/
 from __future__ import unicode_literals
 import re
-from django.shortcuts import render_to_response
+from functools import cmp_to_key
+
+from django.shortcuts import render
 from django.core import serializers
+from .models import Entity
 
 
 RESULTS_PER_PAGE = 10
 
 
 def home(request):
-    return render_to_response('index.html')
+    return render(request, 'index.html')
 
 
 def search(request):
@@ -17,37 +20,41 @@ def search(request):
     # (?u) passes a flag to be unicode sensitive.
     # With it, any letter/word character in any 
     # language is recognized as a word character.
-    split_query = re.split(ur'(?u)\W', query)
+    split_query = re.split(r'(?u)\W', query)
     
     while '' in split_query:
         split_query.remove('')
     
     results = []
     for word in split_query:
-        for entity in Entity.objects.filter(name__icontains=word)
-            if re.match(ur'(?ui)\b' + word + ur'\b'):
-                entity = {
+        for entity in Entity.objects.filter(name__icontains=word):
+            # ignore case, and do unicode matching
+            if re.match(r'(?ui)\b' + word + r'\b'):
+                entry = {
                     'id': entity.id,
                     'name': entity.name,
                     'description': entity.description
                 }
-            if not entry in results:
+            if entry not in results:
                 results.append(entry)
 
     for entry in results:
         score = 0
         for word in split_query:
-            if re.match(ur'(?ui)\b' + word + ur'\b'):
+            if re.match(r'(?ui)\b' + word + r'\b'):
                 score += 1
         entry['score'] = score
 
     def compare(a, b):
-        if cmp(a['score', b['score']) == 0:
-            return cmp(a['name'], b['name'])
+        x = a['score']
+        y = b['score']
+        # python3 work around for the removed cmp()
+        if ((x > y) - (x < y)) == 0:
+            return (x > y) - (x < y)
         else:
-            return -cmp(a['score'], b['score'])        
+            return -((x > y) - (x < y))
     
-    results.sort(compare)
+    results.sort(key=cmp_to_key(compare))
 
     try:
         start = int(request.POST['start'])
