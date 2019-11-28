@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head_title %}Photo Directory: Search{% endblock head_title %}
+
+{% block body_main %}
+  <div id='notifications'></div>
+  <form name='search_form' id='search_form' action='/'>
+    <input type='text' name='query' id='query' /><br/>
+    <input type='submit' name='submit' id='submit' value='Search' />
+  </form>
+  <div id='results'></div>
+  <div id='login_form' title='Log in'>
+    <form>
+      <fieldset>
+        <label for='login'>Login:</label>
+        <input type='text' name='login' id='login'
+          class='text ui-widget-content ui-corner-all' /><br/>
+        <label for='password'>Password:</label>
+        <input type='password' name='password' id='password'
+          class='text ui-widget-content ui-corner-all' /><br/>
+      </fieldset>
+    </form> 
+  </div>
+{% endblock body_main %}
+
+{% block footer_javascript_page %}
+  <!-- <script type='text/javascript' src='{% static "directory/js/jquery.js" %}'></script> -->
+  <script type='text/javascript'>
+    function checkIfAuthenticated (parserdJson) {
+      if (parsedJson.not_authenticated) { return false }
+      return true
+    };
+
+    function offerLogin () {
+      $('#login_form').dialog('open')
+    };
+
+    function sendNotification (msg) {
+      $('#notifications').html('<p>' + msg + '</p>')
+      setTimeout(
+        function () {
+          $('#notifications').show('slow').delay(5000).hide('slow')
+        }, 0);
+    };
+
+    $(function () {
+      $('#submit').click(function ($e) {
+        $e.preventDefault()
+        submitSearch()
+      });
+
+      $('#query').width($(window).width() - 240);
+
+      $('#login_form').dialog({
+        autoOpen: false,
+        height: 150,
+        width: 350,
+        modal: true,
+        buttons: {
+          'Log in': function () {
+            $.ajax({
+              data: {
+                login: $('#login').val(),
+                password: $('#password').val()
+              },
+              dataType: 'text',
+              type: 'POST',
+              url: '/ajax/login',
+              success: function (data, textStatus, xhr) {
+                if (data) {
+                  sendNotification('You have successfully logged in.')
+                  $(this).dialog('close')
+                  submitSearch()
+                } else {
+                  sendNotification('Your login was not successful.')
+                }
+              }
+            });
+            $('#password').val('')
+          },
+          'Forgot password': function () {
+            sendNotification('This feature has not been implemented yet.')
+          },
+          'Create account': function () {
+            sendNotification('This feature has not been implemented yet.')
+          }
+        }
+      });
+      
+      $.ajaxSetup({
+        error: function (xhr, textStatus, errorThrown) {
+          sendNotification(textStatus + '<p></p>' + errorThrown)
+        }
+      });
+    }); 
+
+    function submitSearch () {
+      $.ajax({
+        data: { query: document.search_form.query.value },
+        dataType: 'json',
+        type: 'POST',
+        url: 'ajax/search',
+        success: function (data, textStatus, xhr) {
+          if (data) {
+            if (checkIfAuthenticated(data)) {
+              $('#results').html('')
+              let results = data[0],
+                  length = data[1]
+              
+              for (let i = 0; i < results.length; i++) {
+                let result = results[i]
+                $('#results').append(
+                  '<p><a href="/entities/' + result['id'] + '">' + result['name'] + '</a><br/>' + 
+                  result['description'] + '</p>'
+                )
+              }              
+            } else {
+              offerLogin()
+            }
+          }
+        }
+      });
+    }
+  </script>
+{% endblock footer_javascript_page %}
