@@ -15,10 +15,10 @@ OFFICE_CHOICES = (
 
 
 class Location(models.Model):
-    notes = models.TextField()
-    office = models.CharField(max_length=2, choices=OFFICE_CHOICES, required=False)
-    postal_address = models.TextField()
-    room = models.TextField()
+    notes = models.TextField(blank=True)
+    office = models.CharField(max_length=2, choices=OFFICE_CHOICES, blank=True)
+    postal_address = models.TextField(blank=True)
+    room = models.TextField(blank=True)
 
 
 class TextEmailField(models.EmailField):
@@ -54,22 +54,17 @@ class Entity(models.Model):
     it is intended to accommodate people, offices, organizational units,
     and possibly other areas.
     """
-    active = models.BooleanField(required=False)
-    # if defined, department should be another 'Entity'
-    department = models.ForeignKey('Entity', required=False)
+    active = models.BooleanField(blank=True)
     description = models.TextField()
-    email = TextEmailField(required=False)
-    # extension = ExtensionField(required=False)
-    homepage = TextURLField(required=False)
-    image = models.FileField(required=False)
-    location = models.ForeignKey(Location, required=False)
+    email = TextEmailField(blank=True)
+    homepage = TextURLField(blank=True)
+    image = models.FileField(blank=True)
+    location = models.ForeignKey(Location, blank=True)
     honors = models.TextField()
     name = models.TextField()
     post_nominals = models.TextField()
-    publish_externally = models.BooleanField(required=False)
-    # if defined, reports_to should be another 'Entity'
-    reports_to = models.ForeignKey('Entity', required=False)
-    start_date = models.DateField(required=False)
+    publish_externally = models.BooleanField(blank=True)
+    start_date = models.DateField(blank=True)
 
 
 # register Entity model to use with the tagging application
