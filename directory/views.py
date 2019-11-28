@@ -40,7 +40,7 @@ def ajax_login_request(request):
 
 
 def home(request):
-    return render(request, 'search.html')
+    return render(request, 'directory/search.html')
 
 
 @ajax_login_required

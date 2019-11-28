@@ -3,4 +3,5 @@ from directory import views
 
 urlpatterns = [
     url(r'^$', views.home),
+    url(r'^ajax/search', views.search),
 ]
